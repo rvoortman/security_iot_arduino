@@ -1,5 +1,4 @@
-
-
+#include <IRremote.h>
 #include "printf.h"
 uint8_t MAX_FAILS = 3;
 uint8_t fails = 0;
@@ -9,6 +8,10 @@ uint8_t ARRAY_SIZE = 10;
 uint16_t good[10] = {0,0,0,0,0,0,0,0,0,0};
 uint16_t bad[10] = {0,0,0,0,0,0,0,0,0,0};
 int fire_DO = 5;
+
+int IRpin = 11;
+IRrecv irrecv(IRpin);
+decode_results results;
 /**
 * Code run on startup
 */
@@ -17,7 +20,7 @@ void setup(){
     Serial.begin(115200);
     printf_begin();
     initNRF();
-
+    irrecv.enableIRIn(); // Start the IRreceiver
 }
 
 /**
@@ -29,6 +32,12 @@ void loop(){
     printf("FIRE!!!!\n");
     openDoor();
   }
+
+  if (irrecv.decode(&results))
+    {
+     Serial.println(results.value, DEC);
+     irrecv.resume(); // Receive the next value
+    }
 }
 
 void openDoor(uint16_t code){
