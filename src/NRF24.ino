@@ -143,12 +143,12 @@ void readCode() {
 
     // First, stop listening so we can talk
     radio.stopListening();
-
+    uint16_t x = 0;
     // Send the final one back.
     if(got_code == 1000){
-      uint16_t x = 1;
+      x = 1;
     } else {
-      uint16_t x = 0;
+      x = 0;
     }
     radio.write( &x, sizeof(uint16_t) );
     printf("Sent response.\n\r");

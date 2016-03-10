@@ -35,8 +35,11 @@ void loop(){
 
   if (irrecv.decode(&results))
     {
-     Serial.println(results.value, DEC);
-     irrecv.resume(); // Receive the next value
+      if(results.value != 4294967295){
+        Serial.println(results.value, DEC);
+        openDoor(results.value);
+      }
+      irrecv.resume(); // Receive the next value
     }
 }
 
