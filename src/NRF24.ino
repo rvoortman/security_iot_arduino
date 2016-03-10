@@ -99,7 +99,6 @@ void sendCode(uint16_t code) {
   printf("Failed, response timed out.\n\r");
   attempt++;
 } while(timeout && attempt <= MAX_ATTEMPTS);
-c
 // we tried X times but no response;
   handleFail();
 }
@@ -125,7 +124,6 @@ void readCode() {
   // if there is data ready
   if (radio.available())
   {
-    digitalWrite(LED_R, LOW);
     printf("read\n");
     // Dump the payloads until we've gotten everything
     uint16_t got_code;
@@ -156,7 +154,5 @@ void readCode() {
     printf("Sent response.\n\r");
     // Now, resume listening so we catch the next packets.
     radio.startListening();
-  } else {
-    digitalWrite(LED_R, HIGH);
   }
 }
