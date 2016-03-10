@@ -28,7 +28,7 @@ void setup(){
 */
 void loop(){
   //testRadio();
-  if(digitalRead(pin) == LOW){
+  if(digitalRead(fire_DO) == LOW){
     printf("FIRE!!!!\n");
     openDoor();
   }
