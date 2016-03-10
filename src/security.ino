@@ -29,7 +29,6 @@ void setup(){
 void loop(){
   //testRadio();
   if(digitalRead(fire_DO) == LOW){
-    printf("FIRE!!!!\n");
     openDoor();
   }
 
@@ -55,11 +54,6 @@ void openDoor(uint16_t code){
 * return true if preCheck was succesful, meaning no communication with the server is needed.
 **/
 bool preCheck(uint16_t code){
-  // checkCode for valit input
-  if(!checkCode(code)){
-    handleFail();
-    return true;
-  }
   // TODO build cache. Is there a timeout for a cached value?
   for(uint8_t x = 0; x < ARRAY_SIZE;x++){
     //  printf("%i\n", x);
@@ -75,10 +69,7 @@ bool preCheck(uint16_t code){
   return false;
 
 }
-// check for valit input
-bool checkCode(uint16_t code) {
-  return (code >= 1000 && code <=9999);
-}
+
 
 // add to good cache
 void addToGoodCache(uint16_t value){
