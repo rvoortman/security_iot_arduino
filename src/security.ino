@@ -8,11 +8,12 @@ uint8_t index_bad = 0;
 uint8_t ARRAY_SIZE = 10;
 uint16_t good[10] = {0,0,0,0,0,0,0,0,0,0};
 uint16_t bad[10] = {0,0,0,0,0,0,0,0,0,0};
+int fire_DO = 5;
 /**
 * Code run on startup
 */
 void setup(){
-
+    pinMode(fire_DO, INPUT);
     Serial.begin(115200);
     printf_begin();
     initNRF();
@@ -24,7 +25,10 @@ void setup(){
 */
 void loop(){
   //testRadio();
-
+  if(digitalRead(pin) == LOW){
+    printf("FIRE!!!!\n");
+    openDoor();
+  }
 }
 
 void openDoor(uint16_t code){
