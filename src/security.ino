@@ -16,14 +16,15 @@ bool code_loaded_from_cache = false;
 */
 void setup(){
     pinMode(fire_DO, INPUT);
-
-    pinMode(open_door_pin, OUTPUT);
-    pinMode(close_door_pin, OUTPUT);
+    pinMode(door_pin, OUTPUT);
 
     Serial.begin(115200);
     printf_begin();
     initNRF();
     irrecv.enableIRIn(); // Start the IRreceiver
+
+    delay(10); // so the door closes properly
+    closeDoor();
 }
 
 /**
@@ -107,5 +108,10 @@ void handleFail(){
 */
 void openDoor(){
   fails = 0; // reset fails.
-  // TODO open the door
+  digitalWrite(door_pin, HIGH);
+}
+
+
+void closeDoor(){
+  digitalWrite(door_pin, LOW);
 }
