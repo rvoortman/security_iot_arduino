@@ -42,23 +42,23 @@ void initNRF(){
   if ( role == role_sender )
   {
     radio.openWritingPipe(pipes[0]);
-    radio.openReadingPipe(1,pipes[1]);
+    radio.openReadingPipe(0,pipes[1]);
   } else {
     radio.openWritingPipe(pipes[1]);
-    radio.openReadingPipe(1,pipes[0]);
+    radio.openReadingPipe(0,pipes[0]);
   }
 
   printf("ROLE: %s\n\r",role_friendly_name[role]);
   radio.startListening();                 // Start listening
   radio.printDetails();
+  radio.powerUp();
 }
 
 // keep sending a test code
 void testRadio(){
   if ( role == role_sender ) {
-    uint16_t x = 1000;
+    unsigned long x = 551489775;
     sendCode(x);
-
     delay(5000);
   } else {
     readCode();
@@ -69,7 +69,7 @@ void testRadio(){
 /**
 * Send code to server
 **/
-void sendCode(uint16_t code) {
+void sendCode( unsigned long code) {
 
   bool timeout = true;
   uint8_t attempt = 1;
@@ -77,28 +77,33 @@ void sendCode(uint16_t code) {
   do {
   // First, stop listening so we can talk.
   radio.stopListening();
-  printf("Now sending %i...",code);
-  radio.write( &code, sizeof(uint16_t) );
+  printf("Now sending %lu...",code);
+  bool ok = radio.write( &code, sizeof( unsigned long) );
+  if(ok){
+    printf("ok...");
+  } else { // only is true if there is a response within 60ms.
+    printf("failed....");
+  }
 
-  // Now, continue listening
-  radio.startListening();
   // give server some time to respond
   timeout = waitForResponse();
   // Describe the results
   if (!timeout )
   {
     // Grab the response, compare, and send to debugging spew
-    uint16_t got_result;
-    radio.read( &got_result, sizeof(uint16_t) );
+    unsigned long got_result;
+    radio.read( &got_result, sizeof( unsigned long) );
     // Spew it
-    printf("Got response %i\n\r",got_result);
+    printf("Got response %li\n\r",got_result);
     handleResponse(got_result, code);
     // we are done
     return;
   }
   printf("Failed, response timed out.\n\r");
   attempt++;
+  delay(1000);
 } while(timeout && attempt <= MAX_ATTEMPTS);
+
 // we tried X times but no response;
   handleFail();
 }
@@ -107,6 +112,10 @@ void sendCode(uint16_t code) {
 // wait for the server to send a response.
 // this functions block for max @TIMEOUT_MS
 bool waitForResponse(){
+
+  // Now, continue listening
+  radio.startListening();
+  delay(10); // a little time to start
   // Wait here until we get a response, or timeout (250ms)
   unsigned long started_waiting_at = millis();
   bool timeout = false;
@@ -126,15 +135,15 @@ void readCode() {
   {
     printf("read\n");
     // Dump the payloads until we've gotten everything
-    uint16_t got_code;
+    unsigned long got_code;
     bool done = false;
     while (!done)
     {
       // Fetch the payload, and see if this was the last one.
-      done = radio.read( &got_code, sizeof(uint16_t) );
+      done = radio.read( &got_code, sizeof( unsigned long) );
 
       // Spew it
-      printf("Got payload %i...",got_code);
+      printf("Got payload %lu...",got_code);
 
       // Delay just a little bit to let the other unit
       // make the transition to receiver
@@ -143,14 +152,14 @@ void readCode() {
 
     // First, stop listening so we can talk
     radio.stopListening();
-    uint16_t x = 0;
+     unsigned long x;
     // Send the final one back.
-    if(got_code == 1000){
-      x = 1;
+    if(got_code == 551489775){
+       x = 1;
     } else {
-      x = 0;
+       x = 0;
     }
-    radio.write( &x, sizeof(uint16_t) );
+    radio.write( &x, sizeof( unsigned long) );
     printf("Sent response.\n\r");
     // Now, resume listening so we catch the next packets.
     radio.startListening();
