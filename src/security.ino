@@ -3,15 +3,14 @@
 uint8_t MAX_FAILS = 3;
 uint8_t fails = 0;
 uint8_t index_good = 0;
-uint8_t index_bad = 0;
 uint8_t ARRAY_SIZE = 10;
-uint16_t good[10] = {0,0,0,0,0,0,0,0,0,0};
-uint16_t bad[10] = {0,0,0,0,0,0,0,0,0,0};
+unsigned long good[10] = {0,0,0,0,0,0,0,0,0,0};
 int fire_DO = 5;
 int IRpin = 6;
 int door_ pin = 7;
 IRrecv irrecv(IRpin);
 decode_results results;
+bool code_loaded_from_cache = false;
 /**
 * Code run on startup
 */
@@ -46,9 +45,10 @@ void loop(){
     }
 }
 
-void openDoor(uint16_t code){
-  if(preCheck(code)){
-    return; // door is open | alarm is raised;
+void openDoor(unsigned long code){
+  code_loaded_from_cache = preCheck(code);
+  if(code_loaded_from_cache{
+    openDoor(); // open door so user dont have to wait for a response from the server.
   }
   // send code to server to see if user can open this door.
   sendCode(code);
@@ -57,19 +57,12 @@ void openDoor(uint16_t code){
 
 
 /**
-* inital check for valit code and cache
-* return true if preCheck was succesful, meaning no communication with the server is needed.
+* Check cache for code.
+* if code exists in cache this function returns true
 **/
-bool preCheck(uint16_t code){
-  // TODO build cache. Is there a timeout for a cached value?
+bool preCheck(unsigned long code){
   for(uint8_t x = 0; x < ARRAY_SIZE;x++){
-    //  printf("%i\n", x);
       if(good[x] == code){
-        openDoor();
-        return true;
-      }
-      if(bad[x] == code){
-        handleFail();
         return true;
       }
   }
@@ -78,31 +71,27 @@ bool preCheck(uint16_t code){
 }
 
 
-// add to good cache
-void addToGoodCache(uint16_t value){
+// add a code to the cache.
+// a maximun of 10 codes is stored in the chace
+void addToGoodCache(unsigned long value){
   if(index_good == ARRAY_SIZE){
       index_good = 0;
   }
   good[index_good] = value;
   index_good++;
 }
-// add to bad cache
-void addToBadCache(uint16_t value){
-  if(index_bad == ARRAY_SIZE){
-      index_bad = 0;
-  }
-  bad[index_bad] = value;
-  index_bad++;
-}
+
 
 // handle a response from NRF24, result + code entert
-void handleResponse(uint16_t result, uint16_t code){
+void handleResponse(unsigned long result, unsigned long code){
   if(result == 1){ // succes add code to cache
     addToGoodCache(code);
-    openDoor();
+    // check if door already has been opend.
+    if(code_loaded_from_cache){
+      openDoor();
+    }
     return;
   } // fail add fail to bad code cache
-  addToBadCache(code);
   handleFail();
 
 }
