@@ -9,8 +9,7 @@ uint16_t good[10] = {0,0,0,0,0,0,0,0,0,0};
 uint16_t bad[10] = {0,0,0,0,0,0,0,0,0,0};
 int fire_DO = 5;
 int IRpin = 6;
-int open_door_ pin = 7;
-int close_door_pin = 8;
+int door_ pin = 7;
 IRrecv irrecv(IRpin);
 decode_results results;
 /**
