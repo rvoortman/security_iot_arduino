@@ -10,7 +10,7 @@ typedef enum { role_sender = 1, role_receiver } role_e;
 // The debug-friendly names of those roles debug things
 const char* role_friendly_name[] = { "invalid", "Sender", "Receiver"};
 role_e role;
-const short role_pin = 3;
+//const short role_pin = 3;
 
 //
 // settings
@@ -23,8 +23,8 @@ uint16_t TIMEOUT_MS = 500;
 
 // setup radio
 void initNRF(){
-  pinMode(role_pin, INPUT);
-  digitalWrite(role_pin,HIGH);
+  // pinMode(role_pin, INPUT);
+  // digitalWrite(role_pin,HIGH);
 
   radio.begin();                           // Setup and configure rf radio
   radio.setRetries(15,15);
@@ -33,12 +33,13 @@ void initNRF(){
   radio.setPayloadSize(8);
 
   // read the address pin, establish our role
-  if (digitalRead(role_pin) ) {
-    role = role_sender;
-  }  else {
-    role = role_receiver;
-  }
+  // if (digitalRead(role_pin) ) {
+  //   role = role_sender;
+  // }  else {
+  //   role = role_receiver;
+  // }
   // set pipes
+  role = role_sender;
   if ( role == role_sender )
   {
     radio.openWritingPipe(pipes[0]);
@@ -69,42 +70,43 @@ void testRadio(){
 /**
 * Send code to server
 **/
-void sendCode( unsigned long code) {
+void sendCode(unsigned long code) {
 
   bool timeout = true;
   uint8_t attempt = 1;
   // run once, more if server does not send a response
   do {
-  // First, stop listening so we can talk.
-  radio.stopListening();
-  printf("Now sending %lu...",code);
-  bool ok = radio.write( &code, sizeof( unsigned long) );
-  if(ok){
-    printf("ok...");
-  } else { // only is true if there is a response within 60ms.
-    printf("failed....");
-  }
+    // First, stop listening so we can talk.
+    radio.stopListening();
+    printf("Now sending %lu...",code);
 
-  // give server some time to respond
-  timeout = waitForResponse();
-  // Describe the results
-  if (!timeout )
-  {
-    // Grab the response, compare, and send to debugging spew
-    unsigned long got_result;
-    radio.read( &got_result, sizeof( unsigned long) );
-    // Spew it
-    printf("Got response %li\n\r",got_result);
-    handleResponse(got_result, code);
-    // we are done
-    return;
-  }
-  printf("Failed, response timed out.\n\r");
-  attempt++;
-  delay(1000);
-} while(timeout && attempt <= MAX_ATTEMPTS);
+    bool ok = radio.write( &code, sizeof( unsigned long) );
+    if(ok){
+      printf("ok...");
+    } else { // only is true if there is a response within 60ms.
+      printf("failed....");
+    }
 
-// we tried X times but no response;
+    // give server some time to respond
+    timeout = waitForResponse();
+    // Describe the results
+    if (!timeout )
+    {
+      // Grab the response, compare, and send to debugging spew
+      unsigned long got_result;
+      radio.read( &got_result, sizeof( unsigned long) );
+      // Spew it
+      printf("Got response %li\n\r",got_result);
+      handleResponse(got_result, code);
+      // we are done
+      return;
+    }
+    printf("Failed, response timed out.\n\r");
+    attempt++;
+    delay(1000);
+  } while(timeout && attempt <= MAX_ATTEMPTS);
+
+  // we tried X times but no response;
   handleFail();
 }
 
