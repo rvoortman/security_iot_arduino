@@ -103,7 +103,7 @@ void sendCode(unsigned long code) {
     }
     printf("Failed, response timed out.\n\r");
     attempt++;
-    delay(1000);
+    delay(500);
   } while(timeout && attempt <= MAX_ATTEMPTS);
 
   // we tried X times but no response;
