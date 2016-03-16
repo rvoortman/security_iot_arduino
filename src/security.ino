@@ -6,8 +6,8 @@ uint8_t index_good = 0;
 uint8_t ARRAY_SIZE = 10;
 unsigned long good[10] = {0,0,0,0,0,0,0,0,0,0};
 int fire_DO = 5;
-
 int IRpin = 6;
+int door_ pin = 7;
 IRrecv irrecv(IRpin);
 decode_results results;
 bool code_loaded_from_cache = false;
@@ -16,10 +16,15 @@ bool code_loaded_from_cache = false;
 */
 void setup(){
     pinMode(fire_DO, INPUT);
+    pinMode(door_pin, OUTPUT);
+
     Serial.begin(115200);
     printf_begin();
     initNRF();
     irrecv.enableIRIn(); // Start the IRreceiver
+
+    delay(10); // so the door closes properly
+    closeDoor();
 }
 
 /**
@@ -106,5 +111,10 @@ void handleFail(){
 */
 void openDoor(){
   fails = 0; // reset fails.
-  // TODO open the door
+  digitalWrite(door_pin, HIGH);
+}
+
+
+void closeDoor(){
+  digitalWrite(door_pin, LOW);
 }
