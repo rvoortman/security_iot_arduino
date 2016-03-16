@@ -7,7 +7,7 @@ uint8_t ARRAY_SIZE = 10;
 unsigned long good[10] = {0,0,0,0,0,0,0,0,0,0};
 int fire_DO = 5;
 int IRpin = 6;
-int door_ pin = 7;
+int door_pin = 7;
 //basically just a LED.
 int alarm_pin = 8;
 
@@ -53,7 +53,7 @@ void loop(){
 
 void openDoor(unsigned long code){
   code_loaded_from_cache = preCheck(code);
-  if(code_loaded_from_cache{
+  if(code_loaded_from_cache){
     openDoor(); // open door so user dont have to wait for a response from the server.
   }
   // send code to server to see if user can open this door.
@@ -108,7 +108,7 @@ void handleResponse(unsigned long result, unsigned long code){
 void handleFail(){
   fails++;
   if(fails >= MAX_FAILS){
-    for(count = 0; count < 10; count++){
+    for(uint8_t count = 0; count < 10; count++){
       digitalWrite(alarm_pin, HIGH);
       delay(500);
       digitalWrite(alarm_pin, LOW);
