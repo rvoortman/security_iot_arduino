@@ -91,13 +91,16 @@ void addToGoodCache(unsigned long value){
 // handle a response from NRF24, result + code entert
 void handleResponse(unsigned long result, unsigned long code){
   if(result == 1){ // succes add code to cache
-    addToGoodCache(code);
+
     // check if door already has been opend.
-    if(code_loaded_from_cache){
+    if(!code_loaded_from_cache){
       openDoor();
+    } else {
+      addToGoodCache(code);
     }
     return;
   } // fail add fail to bad code cache
+
   handleFail();
 
 }
