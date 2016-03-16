@@ -8,6 +8,9 @@ unsigned long good[10] = {0,0,0,0,0,0,0,0,0,0};
 int fire_DO = 5;
 int IRpin = 6;
 int door_ pin = 7;
+//basically just a LED.
+int alarm_pin = 8;
+
 IRrecv irrecv(IRpin);
 decode_results results;
 bool code_loaded_from_cache = false;
@@ -15,8 +18,10 @@ bool code_loaded_from_cache = false;
 * Code run on startup
 */
 void setup(){
+    //initialise the pins for firesensor, door and alarm
     pinMode(fire_DO, INPUT);
     pinMode(door_pin, OUTPUT);
+    pinMode(alarm_pin, OUTPUT);
 
     Serial.begin(115200);
     printf_begin();
@@ -100,7 +105,13 @@ void handleResponse(unsigned long result, unsigned long code){
 void handleFail(){
   fails++;
   if(fails >= MAX_FAILS){
-    // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! alarm
+    for(count = 0; count < 10; count++){
+      digitalWrite(alarm_pin, HIGH);
+      delay(500);
+      digitalWrite(alarm_pin, LOW);
+      delay(500);
+    }
+
   }
 }
 
