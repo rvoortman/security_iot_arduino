@@ -123,6 +123,8 @@ void handleFail(){
 void openDoor(){
   fails = 0; // reset fails.
   digitalWrite(door_pin, HIGH);
+  delay(5000);
+  closeDoor();
 }
 
 
